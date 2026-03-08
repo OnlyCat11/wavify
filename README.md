@@ -1,8 +1,7 @@
 # audio-dataset-preprocessor
 
-![License](https://img.shields.io/badge/license-MIT-blue)
-![OS](https://img.shields.io/badge/OS-Windows%2010%2F11-blue)
-![Dependency](https://img.shields.io/badge/Dependency-FFmpeg-orange)
+[![Dependency](https://img.shields.io/badge/Dependency-FFmpeg-orange)](https://ffmpeg.org/)
+[![Release](https://img.shields.io/github/v/release/OnlyCat11/audio-dataset-preprocessor)](https://github.com/OnlyCat11/audio-dataset-preprocessor/releases/latest)
 
 > An FFmpeg-based tool for preprocessing audio datasets
 
@@ -18,7 +17,7 @@
 
 ## Features
 
-- **Audio Standardization:** Converts all audio files to WAV format (`48kHz`, `PCM 16-bit`, `Mono`).
+- **Audio Standardization:** Converts most audio and video formats to WAV (`48kHz`, `PCM 16-bit`, `Mono`).
 - **Automated Pipeline:** Processes all files in batch and automatically creates a result folder such as `finished001`. Output files are sequentially indexed (e.g., `01.wav`).
 - **Real-time Progress Monitoring:** Displays a colored progress bar and processing status in the PowerShell console, along with the total processing time upon completion.
 
@@ -34,19 +33,20 @@
 
 ## Installation
 
-Clone this repository using `git clone`, or download the `audio-dataset-preprocessor.ps1` file directly and place it in your desired folder.
+Download from the [Release](https://github.com/OnlyCat11/audio-dataset-preprocessor/releases/latest) page.
+
+**or**
+
+Clone the repository:
+
+```bash
+git clone https://github.com/OnlyCat11/audio-dataset-preprocessor.git
+```
 
 ## Usage
 
-1. Place the files to convert in the same folder as the script.
-2. Run the following command in the terminal.
-
-- Tip: You can quickly open PowerShell by **Shift + Right-clicking** inside the folder and selecting `Open PowerShell window here`. Then paste and run only the second line of the command below.
-
-```powershell
-cd "your-folder-path"
-.\audio-dataset-preprocessor.ps1
-```
+1. Put the files you want to preprocess in the same folder as the script.
+2. Run `run.bat`.
 
 ---
 
@@ -56,7 +56,7 @@ cd "your-folder-path"
 
 ## Features
 
-- **Audio Standardization:** 모든 파일을 WAV 형식(`48kHz`, `PCM 16-bit`, `Mono`)으로 변환합니다.
+- **Audio Standardization:** 대부분의 오디오 및 비디오 포맷을 WAV (`48kHz`, `PCM 16-bit`, `Mono`)으로 변환합니다.
 - **Automated Pipeline:** 모든 파일은 일괄로 처리하며, 해당 폴더 안에 `finished001`과 같은 결과 폴더를 자동 생성합니다. 결과 파일 이름은 `01.wav`와 같이 순차적으로 인덱싱됩니다.
 - **Real-time Progress Monitoring:** PowerShell 터미널에서 컬러 Progress Bar와 진행률을 표시합니다. 또한 완료 시 총 처리 시간도 출력됩니다.
 
@@ -72,19 +72,20 @@ cd "your-folder-path"
 
 ## Installation
 
-이 저장소를 `git clone` 하거나 `audio-dataset-preprocessor.ps1` 파일을 직접 다운로드해 원하는 폴더에 두세요.
+[Release](https://github.com/OnlyCat11/audio-dataset-preprocessor/releases/latest) 페이지에서 다운로드합니다.
+
+**또는**
+
+저장소를 클론합니다.
+
+```bash
+git clone https://github.com/OnlyCat11/audio-dataset-preprocessor.git
+```
 
 ## Usage
 
-1. 변환할 파일을 스크립트가 있는 폴더에 넣습니다.
-2. 터미널에서 아래 명령어를 실행합니다.
-
-- Tip: 폴더의 빈 공간에서 **Shift + 우클릭** → `여기에 PowerShell 창 열기(S)`를 선택한 다음에 아래 두 번째 줄만 붙여넣어 실행하면 더 빠릅니다.
-
-```powershell
-cd "해당-폴더-경로"
-.\audio-dataset-preprocessor.ps1
-```
+1. 전처리할 파일들을 스크립트와 같은 폴더에 넣습니다.
+2. `run.bat`를 실행하세요.
 
 ---
 
