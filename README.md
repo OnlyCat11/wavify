@@ -17,18 +17,28 @@
 
 ## Features
 
-- **Audio Standardization:** Converts most audio and video formats to WAV (`48kHz`, `PCM 16-bit`, `Mono`).
+- **Audio Standardization:** Converts audio and video formats to WAV (`48kHz`, `PCM 16-bit`, `Mono`).
+
+  <details>
+  <summary><b>Supported Formats</b></summary>
+
+  `wav` `mp3` `flac` `ogg` `opus` `m4a` `mp4` `aac` `alac` `wma` `aiff` `webm` `ac3`
+
+  </details>
+
 - **Automated Pipeline:** Processes all files in batch and automatically creates a result folder such as `finished001`. Output files are sequentially indexed (e.g., `01.wav`).
-- **Real-time Progress Monitoring:** Displays a colored progress bar and processing status in the PowerShell console, along with the total processing time upon completion.
+- **Parallel Processing:** Automatically assigns half of the available CPU threads to process multiple files simultaneously.
+- **Real-time Progress Monitoring:** Displays a colored progress bar, processing status, and assigned CPU threads in the PowerShell console, along with the total processing time upon completion.
 
 <img src="./audio-dataset-preprocessor-ui.png" width="600px">
 
-- **Verification:** Includes checks for input file existence and prevents duplicate result folder creation.
+- **Verification:** Includes checks for FFmpeg installation, input file existence, and duplicate result folder prevention. Conversion errors and timeouts are collected and reported upon completion.
 
 ## Requirements
 
 - **OS:** Windows 10 / 11 (recommended, tested on Windows 11 25H2)
-- **Shell:** Windows PowerShell
+- **PowerShell:** Windows PowerShell 5.1 or later
+- **.NET Framework:** 4.0 or later (pre-installed on Windows 10/11)
 - **Dependencies:** [FFmpeg](https://www.ffmpeg.org/) (recommended to add it to the system PATH)
 
 ## Installation
@@ -51,12 +61,14 @@ git clone https://github.com/OnlyCat11/audio-dataset-preprocessor.git
 ## Example
 
 **Input**
+
 - file1.wav
 - file2.mp3
 - video1.mp4
 
 **Output**
 finished001/
+
 - 01.wav
 - 02.wav
 - 03.wav
@@ -81,18 +93,28 @@ audio-dataset-preprocessor/
 
 ## 주요 기능 (Features)
 
-- **Audio Standardization:** 대부분의 오디오 및 비디오 포맷을 WAV (`48kHz`, `PCM 16-bit`, `Mono`)으로 변환합니다.
+- **Audio Standardization:** 오디오 및 비디오 포맷을 WAV (`48kHz`, `PCM 16-bit`, `Mono`)으로 변환합니다.
+
+  <details>
+  <summary><b>지원 포맷</b></summary>
+
+  `wav` `mp3` `flac` `ogg` `opus` `m4a` `mp4` `aac` `alac` `wma` `aiff` `webm` `ac3`
+
+  </details>
+
 - **Automated Pipeline:** 모든 파일은 일괄로 처리하며, 해당 폴더 안에 `finished001`과 같은 결과 폴더를 자동 생성합니다. 결과 파일 이름은 `01.wav`와 같이 순차적으로 인덱싱됩니다.
-- **Real-time Progress Monitoring:** PowerShell 터미널에서 컬러 Progress Bar와 진행률을 표시합니다. 또한 완료 시 총 처리 시간도 출력됩니다.
+- **Parallel Processing:** 가용 CPU 스레드의 절반을 자동으로 할당하여 여러 파일을 동시에 처리합니다.
+- **Real-time Progress Monitoring:** PowerShell 터미널에서 컬러 Progress Bar, 진행률, 할당된 CPU 스레드 수를 표시합니다. 또한 완료 시 총 처리 시간도 출력됩니다.
 
 <img src="./audio-dataset-preprocessor-ui.png" width="600px">
 
-- **Verification:** 입력 파일 존재 확인 및 결과 폴더 중복 방지 로직을 포함합니다.
+- **Verification:** FFmpeg 설치 여부, 입력 파일 존재 확인 및 결과 폴더 중복 방지 로직을 포함합니다. 변환 실패 및 타임아웃 에러는 완료 시 일괄 출력됩니다.
 
 ## 요구 사항 (Requirements)
 
 - **OS:** Windows 10 / 11 (권장, Windows 11 25H2 환경에서 테스트됨)
-- **Shell:** Windows PowerShell
+- **PowerShell:** Windows PowerShell 5.1 이상
+- **.NET Framework:** 4.0 이상 (Windows 10/11에 기본 내장됨)
 - **Dependencies:** [FFmpeg](https://www.ffmpeg.org/) (설치 시, 환경 변수 PATH 등록 권장)
 
 ## 설치 방법 (Installation)
@@ -115,12 +137,14 @@ git clone https://github.com/OnlyCat11/audio-dataset-preprocessor.git
 ## 예시 (Example)
 
 **입력**
+
 - file1.wav
 - file2.mp3
 - video1.mp4
 
 **출력**
 finished001/
+
 - 01.wav
 - 02.wav
 - 03.wav
