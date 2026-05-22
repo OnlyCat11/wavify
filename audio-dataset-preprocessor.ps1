@@ -1,13 +1,20 @@
-& {
-    $Start_Time = Get-Date
+function Convert-AudioDataset {
+    param(
+        [string]$SourcePath = ".\*",
+        [int]$SampleRate = 48000,
+        [int]$TimeoutMs = 150000,
+        [int]$BarLength = 30,
+        [string[]]$AudioFormats = @("*.wav", "*.mp3", "*.flac", "*.ogg", "*.opus", "*.m4a", "*.mp4", "*.aac", "*.alac", "*.wma", "*.aiff", "*.webm", "*.ac3")
+    )
+
+    $startTime = Get-Date
 
     if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
         Write-Host "Error: ffmpeg cannot be found." -ForegroundColor Red
         return
     }
 
-    $audio_format = "*.wav", "*.mp3", "*.flac", "*.ogg", "*.opus", "*.m4a", "*.mp4", "*.aac", "*.alac", "*.wma", "*.aiff", "*.webm", "*.ac3"
-    $files = Get-ChildItem -Path .\* -File -Include $audio_format | Where-Object { $_.DirectoryName -notmatch "finished\d{3}" }
+    $files = Get-ChildItem -Path $SourcePath -File -Include $AudioFormats | Where-Object { $_.DirectoryName -notmatch "finished\d{3}" }
     $totalCount = $files.Count
     if ($totalCount -eq 0) {
         Write-Host "Error: No files found." -ForegroundColor Red
@@ -25,8 +32,8 @@
     # ansi
     $e = [char]27
     $dim = { param($t)"$e[90m$t$e[0m" }
-    $bar_cyan = "$e[96m"
-    $bar_endansi = "$e[0m"
+    $barCyan = "$e[96m"
+    $barEndAnsi = "$e[0m"
     $fChar = [char]0x2588
     $eChar = [char]0x2591
 
@@ -35,28 +42,28 @@
     $pool.Open()
 
     $scriptBlock = {
-        param($fFull, $fName, $dest, $shared)
+        param($fFull, $fName, $destPath, $sharedState, $sampleRate, $timeoutMs)
         try {
             $p = New-Object System.Diagnostics.Process
             $p.StartInfo.FileName = "ffmpeg"
-            $p.StartInfo.Arguments = "-y -nostdin -threads 1 -i `"$fFull`" -ar 48000 -acodec pcm_s16le -ac 1 `"$dest`" -loglevel error"
+            $p.StartInfo.Arguments = "-y -nostdin -threads 1 -i `"$fFull`" -ar $sampleRate -acodec pcm_s16le -ac 1 `"$destPath`" -loglevel error"
             $p.StartInfo.UseShellExecute = $false
             $p.StartInfo.CreateNoWindow = $true
             $p.StartInfo.RedirectStandardError = $true
             $null = $p.Start()
             
             $errTask = $p.StandardError.ReadToEndAsync()
-            if (-not $p.WaitForExit(150000)) {
+            if (-not $p.WaitForExit($timeoutMs)) {
                 $p.Kill()
                 $p.WaitForExit(5000) | Out-Null
-                $shared.Errors.Add("[$fName] Timeout") | Out-Null
+                $sharedState.Errors.Add("[$fName] Timeout") | Out-Null
             }
             elseif ($p.ExitCode -ne 0) {
-                $shared.Errors.Add("[$fName] FFmpeg Error: $($errTask.Result.Trim())") | Out-Null
+                $sharedState.Errors.Add("[$fName] FFmpeg Error: $($errTask.Result.Trim())") | Out-Null
             }
         }
         catch {
-            $shared.Errors.Add("[$fName] Critical: $($_.Exception.Message)") | Out-Null
+            $sharedState.Errors.Add("[$fName] Critical: $($_.Exception.Message)") | Out-Null
         }
         finally {
             if ($p) { $p.Dispose() }
@@ -73,7 +80,14 @@
         
         $ps = [System.Management.Automation.PowerShell]::Create()
         $ps.RunspacePool = $pool
-        $null = $ps.AddScript($scriptBlock).AddArgument($file.FullName).AddArgument($file.Name).AddArgument($destPath).AddArgument($shared)
+        $null = $ps.AddScript($scriptBlock).
+                    AddArgument($file.FullName).
+                    AddArgument($file.Name).
+                    AddArgument($destPath).
+                    AddArgument($shared).
+                    AddArgument($SampleRate).
+                    AddArgument($TimeoutMs)
+                    
         $jobs.Add([PSCustomObject]@{ PS = $ps; Handle = $ps.BeginInvoke() })
         $idx++
     }
@@ -84,13 +98,13 @@
     while ($true) {
         $doneCount = ($jobs | Where-Object { $_.Handle.IsCompleted }).Count
         $percent = $doneCount / $totalCount
-        $padLen = [int]($percent * 30)
+        $padLen = [int]($percent * $BarLength)
         $pctText = ([Math]::Round($percent * 100)).ToString().PadLeft(3)
     
-        $detail_info = & $dim " ($doneCount/$totalCount)"
-        $ui_msg = "`r Processing: " + $bar_cyan + ($fStr * $padLen) + $bar_endansi + ($eStr * (30 - $padLen)) + " " + $bar_cyan + $pctText + "%" + $bar_endansi + $detail_info
+        $detailInfo = & $dim " ($doneCount/$totalCount)"
+        $uiMsg = "`r Processing: " + $barCyan + ($fStr * $padLen) + $barEndAnsi + ($eStr * ($BarLength - $padLen)) + " " + $barCyan + $pctText + "%" + $barEndAnsi + $detailInfo
     
-        Write-Host $ui_msg -NoNewline
+        Write-Host $uiMsg -NoNewline
 
         if ($doneCount -ge $totalCount) { break }
         Start-Sleep -Milliseconds 300
@@ -100,8 +114,9 @@
     $pool.Close(); $pool.Dispose()
 
     Write-Host "`n`n`nOutput Saved to [$folderName]" -ForegroundColor Yellow
-    $Total_Time = (Get-Date) - $Start_Time
-    Write-Host ("Total Processing Time: " + $(if ($Total_Time.Hours -gt 0) { "$($Total_Time.Hours)h " }) + "$($Total_Time.Minutes)m $($Total_Time.Seconds)s $($Total_Time.Milliseconds)ms") -ForegroundColor Cyan
+    
+    $totalTime = (Get-Date) - $startTime
+    Write-Host ("Total Processing Time: " + $(if ($totalTime.Hours -gt 0) { "$($totalTime.Hours)h " }) + "$($totalTime.Minutes)m $($totalTime.Seconds)s $($totalTime.Milliseconds)ms") -ForegroundColor Cyan
 
     if ($shared.Errors.Count -gt 0) {
         Write-Host "`n[Errors: $($shared.Errors.Count)]" -ForegroundColor Red
@@ -111,3 +126,5 @@
         }
     }
 }
+
+Convert-AudioDataset -SampleRate 48000 -TimeoutMs 150000 -BarLength 30
